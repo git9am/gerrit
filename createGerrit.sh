@@ -29,7 +29,7 @@ docker run \
 --restart=unless-stopped \
 -d ${POSTGRES_IMAGE}
 
-while [ -z "$(docker logs ${PG_GERRIT_NAME} 2>&1 | grep 'autovacuum launcher started')" ]; do
+while [ -z "$(docker logs ${PG_GERRIT_NAME} 2>&1 | grep 'database system is ready to accept connections')" ]; do
     echo "Waiting postgres ready."
     sleep 1
 done

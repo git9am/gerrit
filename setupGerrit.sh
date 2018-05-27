@@ -3,9 +3,9 @@ set -e
 
 HOST_NAME=${HOST_NAME:-$1}
 GERRIT_WEBURL=${GERRIT_WEBURL:-$2}
-LDAP_ADMIN_UID=${LDAP_ADMIN_UID:-$3}
-LDAP_ADMIN_PWD=${LDAP_ADMIN_PWD:-$4}
-LDAP_ADMIN_EMAIL=${LDAP_ADMIN_EMAIL:-$5}
+GERRIT_ADMIN_UID=${GERRIT_ADMIN_UID:-$3}
+GERRIT_ADMIN_PWD=${GERRIT_ADMIN_PWD:-$4}
+GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$5}
 SSH_KEY_PATH=${SSH_KEY_PATH:-~/.ssh/id_rsa}
 CHECKOUT_DIR=./git
 
@@ -14,7 +14,7 @@ CHECKOUT_DIR=./git
 GERRIT_WEBURL=${GERRIT_WEBURL%/}
 
 # Add ssh-key
-cat "${SSH_KEY_PATH}.pub" | curl --data @- --user "${LDAP_ADMIN_UID}:${LDAP_ADMIN_PWD}"  ${GERRIT_WEBURL}/a/accounts/self/sshkeys
+cat "${SSH_KEY_PATH}.pub" | curl --data @- --user "${GERRIT_ADMIN_UID}:${GERRIT_ADMIN_PWD}"  ${GERRIT_WEBURL}/a/accounts/self/sshkeys
 echo "DONE"
 
 #gather server rsa key
@@ -34,9 +34,9 @@ eval $(ssh-agent)
 ssh-add "${SSH_KEY_PATH}"
 
 #git config
-git config user.name  ${LDAP_ADMIN_UID}
-git config user.email ${LDAP_ADMIN_EMAIL}
-git remote add origin ssh://${LDAP_ADMIN_UID}@${HOST_NAME}:29418/All-Projects
+git config user.name  ${GERRIT_ADMIN_UID}
+git config user.email ${GERRIT_ADMIN_EMAIL}
+git remote add origin ssh://${GERRIT_ADMIN_UID}@${HOST_NAME}:29418/All-Projects
 #checkout project.config
 git fetch -q origin refs/meta/config:refs/remotes/origin/meta/config
 git checkout meta/config

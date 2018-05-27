@@ -59,8 +59,8 @@ docker run \
 -e SMTP_PASS=${SMTP_PASS} \
 -e USER_EMAIL=${USER_EMAIL} \
 -e GERRIT_INIT_ARGS='--install-plugin=download-commands --install-plugin=replication' \
--e INITIAL_ADMIN_USER=${LDAP_ADMIN_UID} \
--e INITIAL_ADMIN_PASSWORD=${LDAP_ADMIN_PWD} \
+-e INITIAL_ADMIN_USER=${GERRIT_ADMIN_UID} \
+-e INITIAL_ADMIN_PASSWORD=${GERRIT_ADMIN_PWD} \
 -e JENKINS_HOST=jenkins \
 -e GITWEB_TYPE=gitiles \
 --restart=unless-stopped \

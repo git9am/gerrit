@@ -9,12 +9,11 @@ GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$5}
 SSH_KEY_PATH=${SSH_KEY_PATH:-~/.ssh/id_rsa}
 CHECKOUT_DIR=./git
 
-
 #Remove appended '/' if existed.
-GERRIT_WEBURL=${GERRIT_WEBURL%/}
+GERRIT_DOMAIN=${GERRIT_DOMAIN%/}
 
 # Add ssh-key
-cat "${SSH_KEY_PATH}.pub" | curl --data @- --user "${GERRIT_ADMIN_UID}:${GERRIT_ADMIN_PWD}"  ${GERRIT_WEBURL}/a/accounts/self/sshkeys
+cat "${SSH_KEY_PATH}.pub" | curl --data @- --user "${GERRIT_ADMIN_UID}:${GERRIT_ADMIN_PWD}"  ${GERRIT_DOMAIN}/a/accounts/self/sshkeys
 echo "DONE"
 
 #gather server rsa key

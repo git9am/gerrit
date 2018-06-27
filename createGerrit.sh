@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 GERRIT_WEBURL=${GERRIT_WEBURL:-$1}
 LDAP_SERVER=${LDAP_SERVER:-$2}
 LDAP_ACCOUNTBASE=${LDAP_ACCOUNTBASE:-$3}
@@ -11,7 +12,7 @@ HTTPD_LISTENURL=${HTTPD_LISTENURL:-http://*:8080}
 GERRIT_NAME=${GERRIT_NAME:-gerrit}
 GERRIT_VOLUME=${GERRIT_VOLUME:-gerrit-volume}
 PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit}
-GERRIT_IMAGE_NAME=${GERRIT_IMAGE_NAME:-openfrontier/gerrit-ci}
+GERRIT_IMAGE_NAME=${GERRIT_IMAGE_NAME:-openfrontier/gerrit}
 POSTGRES_IMAGE=${POSTGRES_IMAGE:-postgres}
 CI_NETWORK=${CI_NETWORK:-ci-network}
 
@@ -38,11 +39,15 @@ done
 docker volume create --name ${GERRIT_VOLUME}
 
 # Start Gerrit.
+GERRIT_SCRIPTS_DIR=/var/gerrit/scripts
+
 docker run \
 --name ${GERRIT_NAME} \
 --net ${CI_NETWORK} \
 -p 29418:29418 \
 --volume ${GERRIT_VOLUME}:/var/gerrit/review_site \
+--volume ${DIR}/docker-entrypoint-init.d:/docker-entrypoint-init.d \
+--volume ${DIR}/scripts:${GERRIT_SCRIPTS_DIR} \
 -e WEBURL=${GERRIT_WEBURL} \
 -e HTTPD_LISTENURL=${HTTPD_LISTENURL} \
 -e DATABASE_TYPE=postgresql \
@@ -61,6 +66,7 @@ docker run \
 -e GERRIT_INIT_ARGS='--install-plugin=download-commands --install-plugin=replication' \
 -e INITIAL_ADMIN_USER=${GERRIT_ADMIN_UID} \
 -e INITIAL_ADMIN_PASSWORD=${GERRIT_ADMIN_PWD} \
+-e GERRIT_SCRIPTS_DIR=${GERRIT_SCRIPTS_DIR} \
 -e JENKINS_HOST=jenkins \
 -e GITWEB_TYPE=gitiles \
 --restart=unless-stopped \

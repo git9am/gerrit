@@ -12,7 +12,7 @@ HTTPD_LISTENURL=${HTTPD_LISTENURL:-http://*:8080}
 GERRIT_NAME=${GERRIT_NAME:-gerrit}
 GERRIT_VOLUME=${GERRIT_VOLUME:-gerrit-volume}
 PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit}
-GERRIT_IMAGE_NAME=${GERRIT_IMAGE_NAME:-openfrontier/gerrit}
+GERRIT_IMAGE_NAME=${GERRIT_IMAGE_NAME:-9am/gerrit}
 POSTGRES_IMAGE=${POSTGRES_IMAGE:-postgres}
 CI_NETWORK=${CI_NETWORK:-ci-network}
 
@@ -38,16 +38,11 @@ done
 # Create Gerrit volume.
 docker volume create --name ${GERRIT_VOLUME}
 
-# Start Gerrit.
-GERRIT_SCRIPTS_DIR=/var/gerrit/scripts
-
 docker run \
 --name ${GERRIT_NAME} \
 --net ${CI_NETWORK} \
 -p 29418:29418 \
 --volume ${GERRIT_VOLUME}:/var/gerrit/review_site \
---volume ${DIR}/docker-entrypoint-init.d:/docker-entrypoint-init.d \
---volume ${DIR}/scripts:${GERRIT_SCRIPTS_DIR} \
 -e WEBURL=${GERRIT_WEBURL} \
 -e HTTPD_LISTENURL=${HTTPD_LISTENURL} \
 -e DATABASE_TYPE=postgresql \
@@ -58,8 +53,14 @@ docker run \
 -e DB_ENV_POSTGRES_PASSWORD=gerrit \
 -e AUTH_TYPE=LDAP \
 -e LDAP_SERVER=${LDAP_SERVER} \
+-e LDAP_SSLVERIFY=true \
+-e LDAP_USERNAME=${SLAPD_DN} \
+-e LDAP_PASSWORD=${SLAPD_PASSWORD} \
 -e LDAP_ACCOUNTBASE=${LDAP_ACCOUNTBASE} \
+-e LDAP_ACCOUNTFULLNAME="${sAMAccountName}" \
+-e LDAP_LOCALUSERNAMETOLOWERCASE=true \
 -e SMTP_SERVER=${SMTP_SERVER} \
+-e SMTP_SERVER_PORT=${SMTP_PORT} \
 -e SMTP_USER=${SMTP_USER} \
 -e SMTP_PASS=${SMTP_PASS} \
 -e USER_EMAIL=${USER_EMAIL} \
@@ -71,4 +72,3 @@ docker run \
 -e GITWEB_TYPE=gitiles \
 --restart=unless-stopped \
 -d ${GERRIT_IMAGE_NAME}
-
